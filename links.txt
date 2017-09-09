@@ -1,0 +1,5 @@
+http://www.ebay.com/itm/100KHz-1-7GHz-full-band-UV-HF-RTL-SDR-USB-Tuner-Receiver-R820T2-8232-Ham-Radio/121361888157?ssPageName=STRK%3AMEBIDX%3AIT&_trksid=p2057872.m2749.l2649
+http://zadig.akeo.ie/
+https://www.rtl-sdr.com/tag/zadig/
+https://github.com/EarToEarOak/SDRSharp-Net-Remote/releases
+http://airspy.com/download/
