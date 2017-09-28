@@ -78,7 +78,7 @@ const unsigned long minDisplayFreqA = 7000000L;
 const unsigned long maxDisplayFreq = 30000000L;
 
 // The frequency that is displayed 
-unsigned long displayFreq = 7035500L;
+unsigned long displayFreq = 7018000L;
 // The IF frequency 
 // const unsigned long ifFreq = 12000000L;
 // The adjustment (calibration - your number will differ)
@@ -148,7 +148,7 @@ void setup() {
   // Function button
 //  pinMode(FUNCTION_BUTTON,INPUT_PULLUP);
   
-  Serial.begin(115200);
+  Serial.begin(9600);
  
   // Initialize with the I2C addr (for the 128x64)
   display.begin(SSD1306_SWITCHCAPVCC,0x3C);
@@ -158,7 +158,7 @@ void setup() {
   Timer1.attachInterrupt(serviceCb); 
 
   // Initial setting
-  setFreq(7035500L);
+  setFreq(7018000L);
 
 //  analogWrite(A7,0);
 }
