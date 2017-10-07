@@ -29,11 +29,11 @@
  */
 
 #include <Wire.h>
-#include <rotary.h>
+//#include <rotary.h>
 #include <avr/io.h>
 #include "Si570.h"
 #include "debug.h"
-#define RADIONO_VERSION "cw-transmitter"
+#define RADIONO_VERSION "20m-SSB"
 #define SI570_I2C_ADDRESS 0x55
 #define CW_TIMEOUT (600l) // in milliseconds, this is the parameter that determines how long the tx will hold between cw key downs
 
@@ -42,8 +42,9 @@
 #define RUN_TESTS 1
 
 unsigned long IF_FREQ = 0L;	
+//unsigned long IF_USB = 0L;
 unsigned long frequency = 7018000L;
-unsigned long vfoA = 7018000L
+unsigned long vfoA = 7018000L, vfoB=7018000L;
 unsigned long TXO = frequency;
 unsigned long cwTimeout = 0;
 unsigned ritOn = 0;
@@ -51,20 +52,21 @@ int byteRead = 0;
 int f_change = 0;
 
 Si570 *vfo;
-Rotary r = Rotary(2,3); // sets the pins the rotary encoder uses.  Must be interrupt pins.
+//Rotary r = Rotary(A4,A5); // sets the pins the rotary encoder uses.  Must be interrupt pins.
 int count = 0;
 
 /* tuning pot stuff */
 unsigned char refreshDisplay = 0;
 unsigned int stepSize = 100;
 int tuningPosition = 0;
+unsigned char locked = 0; //the tuning can be locked: wait until it goes into dead-zone before unlocking it
 int_fast32_t increment = 100; // starting VFO update increment in HZ. tuning step
 String hertz = "50 Hz";
 int  hertzPosition = 0;
 int var_i = 0;
 
 /* the digital controls */
-#define TX_RX (6)
+#define TX_RX (3)
 #define TX_ON (7)
 #define FBUTTON (A3)
 #define ANALOG_TUNING (A2)
@@ -335,7 +337,83 @@ void checkTX(){
 
 /// end check tx
 
+int btnDown(){
+  if (analogRead(FBUTTON) < 300){
+    return 1;
+  }
+  else{
+    return 0;
+  }
 }
-// end
+// end btn
+void checkButton(){
+  int i, t1, t2;
+  //only if the button is pressed
+  if (!btnDown())
+    return;
+
+  //if the btn is down while tuning pot is not centered, then lock the tuning
+  //and return
+  if (tuningPosition < -50 || tuningPosition > 50){
+    if (locked)
+      locked = 0;
+    else
+      locked = 1;
+    delay(200);
+    return;
+  }
+
+  t1 = t2 = i = 0;
+
+  while (t1 < 30 && btnDown() == 1){
+    delay(50);
+    t1++;
+  }
+
+  while (t2 < 10 && btnDown() == 0){
+    delay(50);
+    t2++;
+  }
+
+  //if the press is momentary and there is no secondary press
+  if (t1 < 10 && t2 > 6){
+    if (ritOn)
+      ritOn = 0;
+    else
+      ritOn = 1;
+//    printLine2("RIT on! ");
+    refreshDisplay = 1;
+  }
+  //there has been a double press
+  else if (t1 < 10 && t2 <= 6) {
+    if (vfoActive == VFO_B){
+      vfoActive = VFO_A;
+      vfoB = frequency;
+      frequency = vfoA;
+    }
+    else{
+      vfoActive = VFO_B;
+      vfoA = frequency;
+      frequency = vfoB;
+    }
+     refreshDisplay++;
+//     printLine2("VFO swap! ");
+  }
+  else if (t1 > 10){
+//    printLine2("VFOs reset!");
+    vfoA= vfoB = frequency;
+//    refreshDisplay++;
+  }
+
+  while (btnDown() == 1){
+     delay(50);
+  }
+}
+// end ...
+
+void readTuningPot(){
+    tuningPosition = analogRead(2) - 512;
+}
+// end read
 
 

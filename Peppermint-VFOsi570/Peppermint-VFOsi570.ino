@@ -74,11 +74,11 @@ const char* modeMenuText[] = {
 
 // band
 const unsigned long minDisplayFreq = 1600000L;
-const unsigned long minDisplayFreqA = 7000000L;
+const unsigned long minDisplayFreqA = 14000000L;
 const unsigned long maxDisplayFreq = 30000000L;
 
 // The frequency that is displayed 
-unsigned long displayFreq = 7018000L;
+unsigned long displayFreq = 14018000L;
 // The IF frequency 
 // const unsigned long ifFreq = 12000000L;
 // The adjustment (calibration - your number will differ)
@@ -158,7 +158,7 @@ void setup() {
   Timer1.attachInterrupt(serviceCb); 
 
   // Initial setting
-  setFreq(7018000L);
+  setFreq(14018000L);
 
 //  analogWrite(A7,0);
 }
